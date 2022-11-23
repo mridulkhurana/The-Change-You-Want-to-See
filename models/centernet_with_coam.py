@@ -279,8 +279,8 @@ def marshal_getitem_data(data, split):
     return {
         "left_image": data["image1"],
         "right_image": data["image2"],
-        "left_image_label": data["label1"],
-        "right_image_label": data["label2"],
+        "left_bit_mask": data["label1"],
+        "right_bit_mask": data["label2"],
     }
 
     # return {

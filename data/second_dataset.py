@@ -85,6 +85,16 @@ class SecondDataset(Dataset):
         image_as_tensor = pil_to_tensor(pil_image).float() / 255.0
         return image_as_tensor
 
+    def read_bitmask_as_tensor(self, path_to_image):
+        """
+        Returms a segmentation bitmask image as tensor.
+        """
+        pil_image = Image.open(path_to_image).convert("L")
+        pil_image = pil_image.point(lambda x: 0 if x<255 else 255, '1')
+        image_as_tensor = pil_to_tensor(pil_image).float()
+        return image_as_tensor
+
+
     def get_inpainted_objects_bitmap_from_image_path(self, image_path, bit_length):
         return NotImplementedError
 
@@ -133,9 +143,9 @@ class SecondDataset(Dataset):
                 cache_data_triton(self.path_to_dataset, os.path.join('im1', image_file_name), self.machine))
         image_2 = self.read_image_as_tensor(
                 cache_data_triton(self.path_to_dataset, os.path.join('im2', image_file_name), self.machine))
-        label_1 = self.read_image_as_tensor(
+        label_1 = self.read_bitmask_as_tensor(
                 cache_data_triton(self.path_to_dataset, os.path.join('label1', image_file_name), self.machine))
-        label_2 = self.read_image_as_tensor(
+        label_2 = self.read_bitmask_as_tensor(
                 cache_data_triton(self.path_to_dataset, os.path.join('label2', image_file_name), self.machine))
 
         return {
