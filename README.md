@@ -114,6 +114,10 @@ Testing:
 
 `python main.py --method centernet --gpus 2 --config_file configs/detection_resnet50_3x_coam_layers_affine.yml --decoder_attention scse --test_from_checkpoint <path>`
 
+Demo/Inference:
+
+`python demo_single_pair.py --load_weights_from <path_to_checkpoint> --config_file configs/detection_resnet50_3x_coam_layers_affine.yml --decoder_attention scse`
+
 ### Pre-trained model
 
 |       Test pairs      |  COCO-Inpainted  |  Synthtext-Change | VIRAT-STD | Kubric-Change  |
