@@ -11,11 +11,10 @@ from mmdet.models.dense_heads.centernet_head import CenterNetHead
 from pytorch_lightning.utilities import rank_zero_only
 
 import utils.general
-# import utils.logging
 import wandb
 from data.datamodule import DataModule
 from models.coattention import CoAttentionModule
-from models.unet import Unet
+from segmentation_models_pytorch.unet.model import Unet
 from utils.voc_eval import BoxList, eval_detection_voc
 
 plt.ioff()
@@ -248,6 +247,7 @@ def marshal_getitem_data(data, split):
     This function marshals that data into the format expected by this
     model/method.
     """
+
     # if split in ["train", "val", "test"]:
     #     (
     #         data["image1"],
@@ -255,22 +255,18 @@ def marshal_getitem_data(data, split):
     #     ) = utils.geometry.resize_image_and_annotations(
     #         data["image1"],
     #         output_shape_as_hw=(256, 256),
-    #         annotations=[data["image1_target_region_as_coco_annotation"]]
-    #         + data["image1_target_annotations"],
+    #         annotations=data["image1_target_annotations"],
     #     )
-    #     data["image1_target_region_as_coco_annotation"] = target_region_and_annotations[0]
-    #     data["image1_target_annotations"] = target_region_and_annotations[1:]
+    #     data["image1_target_annotations"] = target_region_and_annotations
     #     (
     #         data["image2"],
     #         target_region_and_annotations,
     #     ) = utils.geometry.resize_image_and_annotations(
     #         data["image2"],
     #         output_shape_as_hw=(256, 256),
-    #         annotations=[data["image2_target_region_as_coco_annotation"]]
-    #         + data["image2_target_annotations"],
+    #         annotations=data["image2_target_annotations"],
     #     )
-    #     data["image2_target_region_as_coco_annotation"] = target_region_and_annotations[0]
-    #     data["image2_target_annotations"] = target_region_and_annotations[1:]
+    #     data["image2_target_annotations"] = target_region_and_annotations
 
     # assert data["image1"].shape == data["image2"].shape
     # image1_target_bboxes = torch.Tensor([x["bbox"] for x in data["image1_target_annotations"]])
@@ -278,6 +274,7 @@ def marshal_getitem_data(data, split):
 
     # if len(image1_target_bboxes) != len(image2_target_bboxes) or len(image1_target_bboxes) == 0:
     #     return None
+
 
     return {
         "left_image": data["image1"],
