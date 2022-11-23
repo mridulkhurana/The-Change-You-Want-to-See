@@ -14,6 +14,7 @@ from data.datamodule import DataModule
 from models.centernet_with_coam import CenterNetWithCoAttention
 from utils.general import get_easy_dict_from_yaml_file
 
+from models.segmentation_with_coam import SegmentationWithCoAttention
 warnings.filterwarnings("ignore")
 
 
@@ -48,7 +49,9 @@ def test(configs, model, logger, datamodule, checkpoint_path, callbacks=None):
 def get_logging_callback_manager(args):
     if args.method == "centernet":
         from models.centernet_with_coam import WandbCallbackManager
-
+        return WandbCallbackManager(args)
+    elif args.method == "segmentation":
+        from models.segmentation_with_coam import WandbCallbackManager
         return WandbCallbackManager(args)
 
     raise NotImplementedError(f"Given method ({args.method}) not implemented!")
@@ -66,6 +69,8 @@ if __name__ == "__main__":
     args, _ = parser.parse_known_args()
     if args.method == "centernet":
         parser = CenterNetWithCoAttention.add_model_specific_args(parser)
+    elif args.method == "segmentation":
+        parser = SegmentationWithCoAttention.add_model_specific_args(parser)
     else:
         raise NotImplementedError(f"Unknown method type {args.method}")
 
@@ -96,6 +101,8 @@ if __name__ == "__main__":
     datamodule = DataModule(configs)
     if configs.method == "centernet":
         model = CenterNetWithCoAttention(configs)
+    elif configs.method == "segmentation":
+        model = SegmentationWithCoAttention(configs)
 
     logger = None
     callbacks = [get_logging_callback_manager(configs)]
@@ -103,7 +110,7 @@ if __name__ == "__main__":
         logger = WandbLogger(
             project="Change-Detection",
             id=configs.wandb_id,
-            save_dir="/work/rs/logs",
+            save_dir="/work/rs/logs", # TBD - change path
             name=configs.experiment_name,
         )
         callbacks.append(ModelCheckpoint(monitor="val/overall_loss", mode="min", save_last=True))
