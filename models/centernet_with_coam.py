@@ -11,7 +11,7 @@ from mmdet.models.dense_heads.centernet_head import CenterNetHead
 from pytorch_lightning.utilities import rank_zero_only
 
 import utils.general
-import utils.logging
+# import utils.logging
 import wandb
 from data.datamodule import DataModule
 from models.coattention import CoAttentionModule
@@ -248,49 +248,56 @@ def marshal_getitem_data(data, split):
     This function marshals that data into the format expected by this
     model/method.
     """
-    if split in ["train", "val", "test"]:
-        (
-            data["image1"],
-            target_region_and_annotations,
-        ) = utils.geometry.resize_image_and_annotations(
-            data["image1"],
-            output_shape_as_hw=(256, 256),
-            annotations=[data["image1_target_region_as_coco_annotation"]]
-            + data["image1_target_annotations"],
-        )
-        data["image1_target_region_as_coco_annotation"] = target_region_and_annotations[0]
-        data["image1_target_annotations"] = target_region_and_annotations[1:]
-        (
-            data["image2"],
-            target_region_and_annotations,
-        ) = utils.geometry.resize_image_and_annotations(
-            data["image2"],
-            output_shape_as_hw=(256, 256),
-            annotations=[data["image2_target_region_as_coco_annotation"]]
-            + data["image2_target_annotations"],
-        )
-        data["image2_target_region_as_coco_annotation"] = target_region_and_annotations[0]
-        data["image2_target_annotations"] = target_region_and_annotations[1:]
+    # if split in ["train", "val", "test"]:
+    #     (
+    #         data["image1"],
+    #         target_region_and_annotations,
+    #     ) = utils.geometry.resize_image_and_annotations(
+    #         data["image1"],
+    #         output_shape_as_hw=(256, 256),
+    #         annotations=[data["image1_target_region_as_coco_annotation"]]
+    #         + data["image1_target_annotations"],
+    #     )
+    #     data["image1_target_region_as_coco_annotation"] = target_region_and_annotations[0]
+    #     data["image1_target_annotations"] = target_region_and_annotations[1:]
+    #     (
+    #         data["image2"],
+    #         target_region_and_annotations,
+    #     ) = utils.geometry.resize_image_and_annotations(
+    #         data["image2"],
+    #         output_shape_as_hw=(256, 256),
+    #         annotations=[data["image2_target_region_as_coco_annotation"]]
+    #         + data["image2_target_annotations"],
+    #     )
+    #     data["image2_target_region_as_coco_annotation"] = target_region_and_annotations[0]
+    #     data["image2_target_annotations"] = target_region_and_annotations[1:]
 
-    assert data["image1"].shape == data["image2"].shape
-    image1_target_bboxes = torch.Tensor([x["bbox"] for x in data["image1_target_annotations"]])
-    image2_target_bboxes = torch.Tensor([x["bbox"] for x in data["image2_target_annotations"]])
+    # assert data["image1"].shape == data["image2"].shape
+    # image1_target_bboxes = torch.Tensor([x["bbox"] for x in data["image1_target_annotations"]])
+    # image2_target_bboxes = torch.Tensor([x["bbox"] for x in data["image2_target_annotations"]])
 
-    if len(image1_target_bboxes) != len(image2_target_bboxes) or len(image1_target_bboxes) == 0:
-        return None
+    # if len(image1_target_bboxes) != len(image2_target_bboxes) or len(image1_target_bboxes) == 0:
+    #     return None
 
     return {
         "left_image": data["image1"],
         "right_image": data["image2"],
-        "left_image_target_bboxes": image1_target_bboxes,
-        "right_image_target_bboxes": image2_target_bboxes,
-        "target_bbox_labels": torch.zeros(len(image1_target_bboxes)).long(),
-        "query_metadata": {
-            "pad_shape": data["image1"].shape[-2:],
-            "border": np.array([0, 0, 0, 0]),
-            "batch_input_shape": data["image1"].shape[-2:],
-        },
+        "left_image_label": data["label1"],
+        "right_image_label": data["label2"],
     }
+
+    # return {
+    #     "left_image": data["image1"],
+    #     "right_image": data["image2"],
+    #     "left_image_target_bboxes": image1_target_bboxes,
+    #     "right_image_target_bboxes": image2_target_bboxes,
+    #     "target_bbox_labels": torch.zeros(len(image1_target_bboxes)).long(),
+    #     "query_metadata": {
+    #         "pad_shape": data["image1"].shape[-2:],
+    #         "border": np.array([0, 0, 0, 0]),
+    #         "batch_input_shape": data["image1"].shape[-2:],
+    #     },
+    # }
 
 
 def dataloader_collate_fn(batch):

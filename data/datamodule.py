@@ -3,7 +3,8 @@ import pytorch_lightning as pl
 from loguru import logger as L
 from torch.utils.data import ConcatDataset, DataLoader
 
-from data.inpainted_coco_dataset import InpatinedCocoDataset  # noqa
+# from data.inpainted_coco_dataset import InpatinedCocoDataset  # noqa
+from data.second_dataset import SecondDataset
 from data.kubric_change import KubricChange  # noqa
 from data.std import StdDataset  # noqa
 from data.synthtext_dataset import SynthTextDataset  # noqa
@@ -96,7 +97,7 @@ class DataModule(pl.LightningDataModule):
             self.val_dataset,
             batch_size=self.batch_size,
             num_workers=self.num_dataloader_workers,
-            collate_fn=collate_fn_wrapper,
+            # collate_fn=collate_fn_wrapper,
         )
 
     def test_dataloader(self):

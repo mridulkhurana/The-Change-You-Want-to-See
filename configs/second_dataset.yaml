@@ -1,0 +1,30 @@
+encoder: resnet50
+attention: coam
+coam_layer_data: [3, [2048, 1024, 512], [256, 128, 64]]
+lr: 0.0001
+weight_decay: 0.0005
+batch_size: 16
+test_batch_size: 16
+num_dataloader_workers: 8
+datasets:
+  train_dataset:
+    name: second_train
+    class: SecondDataset
+    args:
+      path_to_dataset: /Users/mridul/workspace/computer vision/second_dataset/SECOND_train_set
+      split: "train"
+      method: "centernet"
+  val_dataset:
+    name: second_val
+    class: SecondDataset
+    args:
+      path_to_dataset: /Users/mridul/workspace/computer vision/second_dataset/SECOND_train_set
+      split: "val"
+      method: "centernet"
+  test_datasets:
+    - name: second_test
+      class: SecondDataset
+      args:
+        path_to_dataset: /Users/mridul/workspace/computer vision/second_dataset/test
+        split: "test"
+        method: "centernet"
