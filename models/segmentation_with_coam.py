@@ -14,10 +14,11 @@ import utils.general
 import wandb
 from data.datamodule import DataModule
 from models.coattention import CoAttentionModule
-from segmentation_models_pytorch.unet.model import Unet
+# from segmentation_models_pytorch.unet.model import Unet
+from models.unet import Unet
 from utils.voc_eval import BoxList, eval_detection_voc
 
-from metric import SegmentationMetrics
+# from metric import SegmentationMetrics
 
 plt.ioff()
 

@@ -13,18 +13,18 @@ datasets:
     args:
       path_to_dataset: /Users/mridul/workspace/computer vision/second_dataset/SECOND_train_set
       split: "train"
-      method: "centernet"
+      method: "segmentation"
   val_dataset:
     name: second_val
     class: SecondDataset
     args:
       path_to_dataset: /Users/mridul/workspace/computer vision/second_dataset/SECOND_train_set
       split: "val"
-      method: "centernet"
+      method: "segmentation"
   test_datasets:
     - name: second_test
       class: SecondDataset
       args:
         path_to_dataset: /Users/mridul/workspace/computer vision/second_dataset/test
         split: "test"
-        method: "centernet"
+        method: "segmentation"

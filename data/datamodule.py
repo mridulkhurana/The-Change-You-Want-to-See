@@ -32,7 +32,8 @@ class DataModule(pl.LightningDataModule):
         if method == "centernet":
             from models.centernet_with_coam import dataloader_collate_fn
         else:
-            raise NotImplementedError(f"Unknown method {method}")
+            # raise NotImplementedError(f"Unknown method {method}")
+            from models.centernet_with_coam import dataloader_collate_fn
         return dataloader_collate_fn
 
     def collate_fn(self, batch, dataset):

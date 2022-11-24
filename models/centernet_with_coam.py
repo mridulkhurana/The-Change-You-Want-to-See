@@ -7,7 +7,7 @@ import torch.nn as nn
 from detectron2.structures.image_list import ImageList
 from easydict import EasyDict
 from loguru import logger as L
-from mmdet.models.dense_heads.centernet_head import CenterNetHead
+# from mmdet.models.dense_heads.centernet_head import CenterNetHead
 from pytorch_lightning.utilities import rank_zero_only
 
 import utils.general

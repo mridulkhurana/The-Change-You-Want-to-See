@@ -37,7 +37,7 @@ class SecondDataset(Dataset):
         if method == "centernet":
             from models.centernet_with_coam import marshal_getitem_data
         else:
-            raise NotImplementedError(f"Unknown method {method}")
+            from models.centernet_with_coam import marshal_getitem_data
         return marshal_getitem_data
 
     def get_train_val_test_split(self, split):
