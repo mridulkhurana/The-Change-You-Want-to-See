@@ -6,6 +6,7 @@ weight_decay: 0.0005
 batch_size: 16
 test_batch_size: 16
 num_dataloader_workers: 8
+classes: 2
 datasets:
   train_dataset:
     name: second_train
@@ -14,6 +15,7 @@ datasets:
       path_to_dataset: /Users/mridul/workspace/computer vision/second_dataset/SECOND_train_set
       split: "train"
       method: "segmentation"
+      image_size: 512
   val_dataset:
     name: second_val
     class: SecondDataset
@@ -21,6 +23,7 @@ datasets:
       path_to_dataset: /Users/mridul/workspace/computer vision/second_dataset/SECOND_train_set
       split: "val"
       method: "segmentation"
+      image_size: 512
   test_datasets:
     - name: second_test
       class: SecondDataset
@@ -28,3 +31,4 @@ datasets:
         path_to_dataset: /Users/mridul/workspace/computer vision/second_dataset/test
         split: "test"
         method: "segmentation"
+        image_size: 512

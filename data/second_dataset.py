@@ -1,6 +1,7 @@
 import os
 import pickle
 import random
+import torch
 from copy import deepcopy
 
 import kornia as K
@@ -96,7 +97,7 @@ class SecondDataset(Dataset):
         pil_image = Image.open(path_to_image).convert("L")
         pil_image = pil_image.resize((self.image_size, self.image_size))
         pil_image = pil_image.point(lambda x: 0 if x<255 else 255, '1')
-        image_as_tensor = pil_to_tensor(pil_image).float()
+        image_as_tensor = pil_to_tensor(pil_image).type(torch.LongTensor)
         return image_as_tensor
 
 

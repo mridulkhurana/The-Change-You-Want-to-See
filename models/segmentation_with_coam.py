@@ -51,14 +51,6 @@ class SegmentationWithCoAttention(pl.LightningModule):
                 for i in range(number_of_coam_layers)
             ]
         )
-
-        # self.centernet_head = CenterNetHead(
-        #     in_channel=64,
-        #     feat_channel=64,
-        #     num_classes=1,
-        #     test_cfg=EasyDict({"topk": 100, "local_maximum_kernel": 3, "max_per_img": 100}),
-        # )
-        # self.centernet_head.init_weights()
         if args.load_weights_from is not None:
             self.safely_load_state_dict(torch.load(args.load_weights_from)["state_dict"])
 
@@ -90,13 +82,9 @@ class SegmentationWithCoAttention(pl.LightningModule):
         return parent_parser
 
     def training_step(self, batch, batch_idx):
-        batch['left_bit_mask'].div_(255)
-        batch['right_bit_mask'].div_(255)
 
         left_image_outputs, right_image_outputs = self(batch)
 
-        # print('left_image_outputs', left_image_outputs.shape)
-        # print("batch['left_bit_mask']", batch['left_bit_mask'].shape)
 
         '''
         left_image_outputs -> (Batch, num_classes, height, width)
@@ -117,12 +105,7 @@ class SegmentationWithCoAttention(pl.LightningModule):
             right_losses = nn.BCELoss()(right_image_outputs.squeeze(1),
                                                 batch['right_bit_mask'])
 
-        # overall_loss = 0
-        # for key in left_losses:
-        #     self.log(
-        #         f"train/{key}", left_losses[key] + right_losses[key], on_step=True, on_epoch=True
-        #     )
-        #     overall_loss += left_losses[key] + right_losses[key]
+
         overall_loss = left_losses + right_losses
         self.log("train/left_losses", left_losses, on_step=True, on_epoch=True)
         self.log("train/right_losses", right_losses, on_step=True, on_epoch=True)
@@ -130,30 +113,12 @@ class SegmentationWithCoAttention(pl.LightningModule):
         return overall_loss
 
     def validation_step(self, batch, batch_index):
-        # print('-'*25, "max of batch['left_image']", batch['left_image'].max())
-        # print('-'*25, "min of batch['left_image']", batch['left_image'].min())
-        # print('-'*25, batch['left_image'][0, 0, :, :])
-
-        batch['left_bit_mask'].div_(255)
-        batch['right_bit_mask'].div_(255)
 
         left_image_outputs, right_image_outputs = self(batch)
 
-        # # print('left_image_outputs', left_image_outputs.shape)
-        # # print("batch['left_bit_mask']", batch['left_bit_mask'].shape)
-        # # print('-'*25, "classes", self.classes)
-        # print('-'*25, "max of batch['left_bit_mask']", batch['left_bit_mask'].max())
-        # print('-'*25, "min of batch['left_bit_mask']", batch['left_bit_mask'].min())
-        # print(batch['left_bit_mask'][0, :, :])
-        # # print('bin count', batch['left_bit_mask'].to(torch.int64).bincount())
-        # print('-'*25, "max of batch['right_bit_mask']", batch['right_bit_mask'].max())
-        # print('-'*25, "min of batch['right_bit_mask']", batch['right_bit_mask'].min())
-        # # print('bin count', batch['right_bit_mask'].to(torch.int64).bincount())
-        # print(batch['right_bit_mask'][0, :, :])
-        # raise
         
         if self.classes > 1:
-            # print('Using multiclass crossentropy.', 'Class size', self.classes)
+
             left_losses = nn.CrossEntropyLoss()(left_image_outputs,
                                                 batch['left_bit_mask'].to(torch.int64))
             right_losses = nn.CrossEntropyLoss()(right_image_outputs,
@@ -169,40 +134,16 @@ class SegmentationWithCoAttention(pl.LightningModule):
         self.log("val/left_losses", left_losses, on_epoch=True)
         self.log("val/right_losses", right_losses, on_epoch=True)
         self.log("val/overall_loss", overall_loss, on_epoch=True)
-        # left_predicted_bboxes = self.centernet_head.get_bboxes(
-        #     *left_image_outputs,
-        #     img_metas=batch["query_metadata"],
-        #     rescale=False,
-        # )
-        # right_predicted_bboxes = self.centernet_head.get_bboxes(
-        #     *right_image_outputs,
-        #     img_metas=batch["query_metadata"],
-        #     rescale=False,
-        # )
-        # return left_predicted_bboxes, right_predicted_bboxes
 
         # left_pred_bit_mask = torch.argmax(left_image_outputs, dim=1)
         # right_pred_bit_mask = torch.argmax(right_image_outputs, dim=1)
         
         truth = torch.cat([batch['left_bit_mask'], batch['right_bit_mask']], dim=-2)
         pred = torch.cat([left_image_outputs, right_image_outputs], dim=-2)
-        # print('truth', truth.shape)
-        # print('pred', pred.shape)
-        # pixel_acc, dice, precision, recall = SegmentationMetrics()(truth, pred)
-
-        # self.log("val/pixel_acc", pixel_acc, on_epoch=True)
-        # self.log("val/dice", dice, on_epoch=True)
-        # self.log("val/precision", precision, on_epoch=True)
-        # self.log("val/recall", recall, on_epoch=True)
-
-        # left_pred_bit_mask = torch.argmax(left_image_outputs, dim=1)
-        # right_pred_bit_mask = torch.argmax(right_image_outputs, dim=1)
 
         # return left_pred_bit_mask, right_pred_bit_mask
 
     def test_step(self, batch, batch_index, dataloader_index=0):
-        # batch['left_bit_mask'].div_(255)
-        # batch['right_bit_mask'].div_(255)
         left_image_outputs, right_image_outputs = self(batch)
 
         if self.classes > 1:
