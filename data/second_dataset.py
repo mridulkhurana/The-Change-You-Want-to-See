@@ -20,7 +20,7 @@ PngImagePlugin.MAX_TEXT_CHUNK = LARGE_ENOUGH_NUMBER * (1024**2)
 
 
 class SecondDataset(Dataset):
-    def __init__(self, path_to_dataset, split, method, image_transformation=None, machine="local"):
+    def __init__(self, path_to_dataset, split, method, image_size, image_transformation=None, machine="local"):
         self.path_to_dataset = path_to_dataset
         train_val_test_split = self.get_train_val_test_split(split)
         self.indicies = train_val_test_split[split]
@@ -32,10 +32,13 @@ class SecondDataset(Dataset):
         #     mode=split, path_to_dataset=path_to_dataset, image_transformation=image_transformation
         # )
         self.marshal_getitem_data = self.import_method_specific_functions(method)
+        self.image_size = image_size
 
     def import_method_specific_functions(self, method):
         if method == "centernet":
             from models.centernet_with_coam import marshal_getitem_data
+        elif method == "segmentation":
+            from models.segmentation_with_coam import marshal_getitem_data
         else:
             from models.centernet_with_coam import marshal_getitem_data
         return marshal_getitem_data
@@ -82,6 +85,7 @@ class SecondDataset(Dataset):
         Returms a normalised RGB image as tensor.
         """
         pil_image = Image.open(path_to_image).convert("RGB")
+        pil_image = pil_image.resize((self.image_size, self.image_size))
         image_as_tensor = pil_to_tensor(pil_image).float() / 255.0
         return image_as_tensor
 
@@ -90,6 +94,7 @@ class SecondDataset(Dataset):
         Returms a segmentation bitmask image as tensor.
         """
         pil_image = Image.open(path_to_image).convert("L")
+        pil_image = pil_image.resize((self.image_size, self.image_size))
         pil_image = pil_image.point(lambda x: 0 if x<255 else 255, '1')
         image_as_tensor = pil_to_tensor(pil_image).float()
         return image_as_tensor

@@ -31,6 +31,8 @@ class DataModule(pl.LightningDataModule):
     def import_method_specific_functions(self, method):
         if method == "centernet":
             from models.centernet_with_coam import dataloader_collate_fn
+        elif method == "segmentation":
+            from models.segmentation_with_coam import dataloader_collate_fn
         else:
             # raise NotImplementedError(f"Unknown method {method}")
             from models.centernet_with_coam import dataloader_collate_fn
@@ -67,6 +69,7 @@ class DataModule(pl.LightningDataModule):
         self.test_dataset_names = []
         self.test_datasets = []
         for test_dataset_config in test_datasets_configs:
+            print(test_dataset_config['args'])
             if test_dataset_config["class"] == "ConcatDataset":
                 datasets = []
                 for dataset_config in test_dataset_config["datasets"]:
